@@ -3,170 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Akshara Alchemist - Universal Build</title>
+    <title>Akshara Alchemist</title>
     <style>
-        :root {
-            --bg: #0f172a;
-            --blue: #38bdf8;
-            --gold: #fbbf24;
-            --white: #f1f5f9;
-            --green: #4ade80;
-        }
-
-        * { box-sizing: border-box; touch-action: manipulation; }
+        :root { --bg: #0f172a; --blue: #38bdf8; --gold: #fbbf24; --white: #f1f5f9; --green: #4ade80; }
+        * { box-sizing: border-box; touch-action: none; } /* Prevents accidental scrolling while dragging */
         
-        html, body { 
-            height: 100%; margin: 0; padding: 0; 
-            overflow: hidden; background: var(--bg); color: var(--white);
-            font-family: system-ui, -apple-system, sans-serif;
+        body { 
+            height: 100vh; margin: 0; overflow: hidden; background: var(--bg); color: var(--white);
+            font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
         }
 
-        body { display: flex; flex-direction: column; align-items: center; padding: 5px; }
+        .container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; padding: 10px; }
+        header { text-align: center; height: 15%; }
+        #goal-area { text-align: center; height: 15%; display: flex; flex-direction: column; justify-content: center; }
+        #target-text { color: var(--gold); font-size: 2.5rem; font-weight: bold; }
 
-        /* SCALABLE WRAPPER */
-        .app-container {
-            width: 100%; max-width: 600px; height: 100%;
-            display: flex; flex-direction: column; justify-content: space-between;
+        /* FIXED GRID FOR MOBILE */
+        .game-grid { display: grid; grid-template-columns: 80px 1fr 80px; gap: 10px; height: 45%; align-items: center; }
+        .bank { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--blue); border-radius: 10px;
+            height: 100%; display: flex; flex-direction: column; align-items: center; padding: 5px; gap: 8px; overflow-y: auto;
         }
+        .bank h3 { font-size: 0.6rem; margin: 2px; color: var(--blue); }
 
-        header { text-align: center; padding: 5px 0; }
-        h1 { font-size: 1.4rem; margin: 0; color: var(--blue); }
-
-        .progress-box { width: 150px; height: 6px; background: #334155; border-radius: 10px; margin: 5px auto; overflow: hidden; }
-        #progress-bar { width: 0%; height: 100%; background: var(--green); transition: 0.3s; }
-
-        #goal-area { text-align: center; height: 15vh; display: flex; flex-direction: column; justify-content: center; }
-        #target-text { color: var(--gold); font-size: 3rem; font-weight: bold; }
-
-        /* FLEXIBLE THREE-COLUMN GRID */
-        .game-grid {
-            display: grid; grid-template-columns: 1fr 2fr 1fr;
-            gap: 10px; height: 45vh; align-items: stretch;
-        }
-
-        .side-bank {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(56,189,248,0.2);
-            border-radius: 12px; display: flex; flex-direction: column; 
-            align-items: center; padding: 10px 5px; gap: 10px; overflow-y: auto;
-        }
-
-        .forge-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
-
+        .forge-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #forge-circle {
-            width: clamp(100px, 25vw, 150px); height: clamp(100px, 25vw, 150px);
-            border: 4px dashed var(--gold); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 3.5rem; background: radial-gradient(circle, rgba(251,191,36,0.1) 0%, transparent 80%);
+            width: 120px; height: 120px; border: 4px dashed var(--gold); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 3rem;
+            background: rgba(251,191,36,0.05); transition: 0.2s;
         }
 
         .tile {
-            width: clamp(50px, 12vw, 70px); height: clamp(50px, 12vw, 70px);
-            background: white; color: #1e293b; border-radius: 10px;
-            display: flex; justify-content: center; align-items: center;
-            font-size: 1.8rem; font-weight: bold; cursor: grab;
+            width: 60px; height: 60px; background: white; color: #1e293b; border-radius: 8px;
+            display: flex; justify-content: center; align-items: center; font-size: 1.8rem; font-weight: bold;
             box-shadow: 0 4px 0 #94a3b8; flex-shrink: 0;
         }
-        .tile.matra { background: var(--gold); box-shadow: 0 4px 0 #b45309; }
+        .tile.m { background: var(--gold); box-shadow: 0 4px 0 #b45309; }
 
-        /* WORD TRAY */
-        #tray-area { min-height: 20vh; display: flex; flex-direction: column; align-items: center; }
-        .tray { display: flex; gap: 8px; padding: 10px; background: rgba(255,255,255,0.03); border-radius: 12px; }
-        .slot {
-            width: clamp(55px, 14vw, 75px); height: clamp(55px, 14vw, 75px);
-            border: 2px dashed #475569; border-radius: 8px;
-            display: flex; justify-content: center; align-items: center; font-size: 2rem;
-        }
+        #tray-area { height: 25%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .tray { display: flex; gap: 5px; }
+        .slot { width: 60px; height: 60px; border: 2px dashed #475569; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
 
-        #hint-msg { font-size: 0.9rem; color: var(--green); min-height: 20px; font-weight: bold; text-align: center; }
-        #next-btn { padding: 10px 25px; border-radius: 20px; background: var(--green); border: none; font-weight: bold; cursor: pointer; }
+        #msg { font-size: 0.9rem; color: var(--green); margin-top: 10px; height: 20px; text-align: center; }
         .hidden { display: none !important; }
-        h3 { font-size: 0.6rem; margin: 0; color: var(--blue); text-transform: uppercase; }
+        #next-btn { padding: 10px 20px; background: var(--green); border: none; border-radius: 20px; font-weight: bold; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
+<div class="container">
     <header>
-        <h1>Akshara Alchemist</h1>
-        <select id="level-sel" onchange="initGame()">
+        <h2 style="margin:0; font-size: 1.2rem;">Akshara Alchemist</h2>
+        <select id="lvl" onchange="start()" style="margin-top:5px; background:#1e293b; color:white; border:1px solid var(--blue); padding:3px;">
             <option value="1">Level 1: Fusion</option>
             <option value="2">Level 2: Words</option>
         </select>
-        <div class="progress-box"><div id="progress-bar"></div></div>
     </header>
 
     <div id="goal-area">
-        <span style="font-size: 0.9rem;">TARGET</span>
         <div id="target-text">की</div>
     </div>
 
     <div class="game-grid">
-        <div class="side-bank" id="v-bank"></div>
+        <div class="bank" id="v-bank"></div>
         <div class="forge-zone">
-            <div id="forge-circle" ondragover="e=>e.preventDefault()" ondrop="handleForgeDrop(event)">?</div>
-            <div id="hint-msg">Drop a Vyanjan</div>
-            <button id="next-btn" class="hidden" onclick="nextMove()">NEXT</button>
+            <div id="forge-circle" ondragover="event.preventDefault()" ondrop="dropToForge(event)" data-v="" data-m="">?</div>
+            <div id="msg">Drop a Vyanjan</div>
+            <button id="next-btn" class="hidden" onclick="moveNext()">Next</button>
         </div>
-        <div class="side-bank" id="m-bank"></div>
+        <div class="bank" id="m-bank"></div>
     </div>
 
     <div id="tray-area" class="hidden">
-        <h3>Assemble Word</h3>
-        <div class="tray" id="main-tray"></div>
+        <div class="tray" id="tray"></div>
     </div>
 </div>
 
 <script>
-    const state = { v: "", m: "", level: 1, index: 0 };
+    const l1 = [
+        {t:"की",v:["क","ल"],m:["ा","ी"]},
+        {t:"पु",v:["प","म"],m:["ु","ू"]},
+        {t:"मछली",v:["म","छ","ल"],m:["ी"]} // Level 2 logic will pull from here
+    ];
     
-    // Combined Data (Full 50 Sample)
-    const l1 = [{t:"की",v:["क","ल"],m:["ा","ी"]},{t:"पु",v:["प","न"],m:["ु","ू"]},{t:"दे",v:["द","स"],m:["े","ै"]}]; //... add others
-    const l2 = [{w:"काम",p:["का","म"],v:["क","म"],m:["ा"]},{w:"किताब",p:["कि","ता","ब"],v:["क","त","ब"],m:["ि","ा"]}];
+    let idx = 0;
 
-    function updateUI() {
-        const circle = document.getElementById('forge-circle');
-        // This forces the UI to always show exactly what is in the state
-        circle.innerText = state.v + state.m || "?";
-        circle.style.borderStyle = (state.v) ? "solid" : "dashed";
-        
-        const data = state.level == 1 ? l1 : l2;
-        const total = data.length;
-        document.getElementById('progress-bar').style.width = (state.index / total * 100) + "%";
+    function start() {
+        idx = 0;
+        load();
     }
 
-    function initGame() {
-        state.level = document.getElementById('level-sel').value;
-        state.index = 0;
-        loadChallenge();
-    }
-
-    function loadChallenge() {
-        state.v = ""; state.m = "";
-        const data = (state.level == 1 ? l1 : l2)[state.index];
-        document.getElementById('target-text').innerText = state.level == 1 ? data.t : data.w;
-        document.getElementById('hint-msg').innerText = "Drop a Vyanjan";
+    function load() {
+        const lvl = document.getElementById('lvl').value;
+        const data = l1[idx]; // Simplified for testing
+        document.getElementById('target-text').innerText = data.t;
         document.getElementById('next-btn').classList.add('hidden');
+        document.getElementById('msg').innerText = "Drop a Vyanjan";
         
+        // Reset Forge attributes
+        const forge = document.getElementById('forge-circle');
+        forge.dataset.v = ""; forge.dataset.m = "";
+        forge.innerText = "?";
+        forge.style.borderStyle = "dashed";
+
+        // Render Banks
+        const vb = document.getElementById('v-bank'); vb.innerHTML = "<h3>VYANJAN</h3>";
+        data.v.forEach(v => vb.innerHTML += `<div class="tile" draggable="true" ondragstart="drag(event,'v','${v}')">${v}</div>`);
+        
+        const mb = document.getElementById('m-bank'); mb.innerHTML = "<h3>MATRA</h3>";
+        data.m.forEach(m => mb.innerHTML += `<div class="tile m" draggable="true" ondragstart="drag(event,'m','${m}')">${m}</div>`);
+
         const trayArea = document.getElementById('tray-area');
-        if(state.level == 2) {
+        if(lvl == "2") {
             trayArea.classList.remove('hidden');
-            const tray = document.getElementById('main-tray');
-            tray.innerHTML = "";
-            data.p.forEach(part => {
-                tray.innerHTML += `<div class="slot" ondragover="event.preventDefault()" ondrop="handleTrayDrop(event, '${part}')">?</div>`;
-            });
+            const t = document.getElementById('tray'); t.innerHTML = "";
+            // Logic to split word into slots...
+            t.innerHTML = `<div class="slot" ondragover="event.preventDefault()" ondrop="dropToTray(event)">?</div>`;
         } else { trayArea.classList.add('hidden'); }
-
-        renderBanks(data.v, data.m);
-        updateUI();
-    }
-
-    function renderBanks(vs, ms) {
-        const vb = document.getElementById('v-bank');
-        const mb = document.getElementById('m-bank');
-        vb.innerHTML = "<h3>V</h3>"; mb.innerHTML = "<h3>M</h3>";
-        vs.forEach(v => vb.innerHTML += `<div class="tile" draggable="true" ondragstart="drag(event, 'v', '${v}')">${v}</div>`);
-        ms.forEach(m => mb.innerHTML += `<div class="tile matra" draggable="true" ondragstart="drag(event, 'm', '${m}')">${m}</div>`);
     }
 
     function drag(e, type, val) {
@@ -174,60 +127,42 @@
         e.dataTransfer.setData("val", val);
     }
 
-    function handleForgeDrop(e) {
+    function dropToForge(e) {
         e.preventDefault();
+        const forge = document.getElementById('forge-circle');
         const type = e.dataTransfer.getData("type");
         const val = e.dataTransfer.getData("val");
 
         if(type === 'v') {
-            state.v = val;
-            state.m = ""; // Clear matra when new consonant arrives
-            document.getElementById('hint-msg').innerText = "Now add Matra";
-        } else if (type === 'm' && state.v !== "") {
-            state.m = val;
+            forge.dataset.v = val; // Store physically in the element
+            forge.dataset.m = ""; 
+            document.getElementById('msg').innerText = "Now add Matra";
+        } else if(type === 'm' && forge.dataset.v !== "") {
+            forge.dataset.m = val; // Store physically in the element
         }
-        
-        updateUI();
-        if(state.level == 1 && (state.v + state.m) === l1[state.index].t) victory();
-        else if(state.level == 2 && state.v !== "" && state.m !== "") document.getElementById('hint-msg').innerText = "Drag circle to Tray";
-    }
 
-    function handleTrayDrop(e, target) {
-        e.preventDefault();
-        const val = state.v + state.m;
-        if(val === target) {
-            e.target.innerText = val;
-            e.target.style.background = "rgba(74,222,128,0.2)";
-            state.v = ""; state.m = ""; // AUTO RESET FORGE
-            updateUI();
-            checkWord();
+        // Always reconstruct from physical storage
+        forge.innerText = forge.dataset.v + forge.dataset.m;
+        forge.style.borderStyle = "solid";
+
+        // Check Victory Level 1
+        if(document.getElementById('lvl').value == "1" && forge.innerText === document.getElementById('target-text').innerText) {
+            victory();
         }
-    }
-
-    function checkWord() {
-        const slots = document.querySelectorAll('.slot');
-        if([...slots].every(s => s.innerText !== "?")) victory();
     }
 
     function victory() {
-        document.getElementById('hint-msg').innerText = "Shabash!";
+        document.getElementById('msg').innerText = "Shabash!";
         document.getElementById('next-btn').classList.remove('hidden');
     }
 
-    function nextMove() {
-        state.index++;
-        const data = state.level == 1 ? l1 : l2;
-        if(state.index >= data.length) { alert("Level Finished!"); state.index = 0; }
-        loadChallenge();
+    function moveNext() {
+        idx++;
+        if(idx >= l1.length) idx = 0;
+        load();
     }
 
-    // Making the Forge itself draggable for Level 2
-    document.getElementById('forge-circle').setAttribute('draggable', 'true');
-    document.getElementById('forge-circle').ondragstart = (e) => {
-        e.dataTransfer.setData("val", state.v + state.m);
-    };
-
-    initGame();
+    start();
 </script>
 </body>
 </html>
