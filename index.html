@@ -6,55 +6,56 @@
     <title>Akshara Alchemist</title>
     <style>
         :root { --bg: #0f172a; --blue: #38bdf8; --gold: #fbbf24; --white: #f1f5f9; --green: #4ade80; }
-        * { box-sizing: border-box; touch-action: none; } /* Prevents accidental scrolling while dragging */
+        * { box-sizing: border-box; touch-action: none; } 
         
         body { 
             height: 100vh; margin: 0; overflow: hidden; background: var(--bg); color: var(--white);
             font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
         }
 
-        .container { width: 100%; max-width: 500px; height: 100%; display: flex; flex-direction: column; padding: 10px; }
-        header { text-align: center; height: 15%; }
-        #goal-area { text-align: center; height: 15%; display: flex; flex-direction: column; justify-content: center; }
-        #target-text { color: var(--gold); font-size: 2.5rem; font-weight: bold; }
+        .container { width: 100%; max-width: 450px; height: 100%; display: flex; flex-direction: column; padding: 10px; }
+        header { text-align: center; height: 12%; }
+        #goal-area { text-align: center; height: 10%; display: flex; align-items: center; justify-content: center; }
+        #target-text { color: var(--gold); font-size: 2.2rem; font-weight: bold; }
 
-        /* FIXED GRID FOR MOBILE */
-        .game-grid { display: grid; grid-template-columns: 80px 1fr 80px; gap: 10px; height: 45%; align-items: center; }
+        /* THE GRID: NO CUT-OFFS */
+        .game-grid { display: grid; grid-template-columns: 75px 1fr 75px; gap: 10px; height: 50%; align-items: center; }
+        
         .bank { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--blue); border-radius: 10px;
-            height: 100%; display: flex; flex-direction: column; align-items: center; padding: 5px; gap: 8px; overflow-y: auto;
+            background: rgba(255,255,255,0.05); border: 1px solid var(--blue); border-radius: 12px;
+            height: 90%; display: flex; flex-direction: column; align-items: center; padding: 5px; gap: 8px; overflow-y: auto;
         }
-        .bank h3 { font-size: 0.6rem; margin: 2px; color: var(--blue); }
+        .bank h3 { font-size: 0.5rem; margin: 2px; color: var(--blue); letter-spacing: 1px; }
 
         .forge-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         #forge-circle {
-            width: 120px; height: 120px; border: 4px dashed var(--gold); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 3rem;
-            background: rgba(251,191,36,0.05); transition: 0.2s;
+            width: 110px; height: 110px; border: 4px dashed var(--gold); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 2.8rem;
+            background: rgba(251,191,36,0.05); box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
         }
 
         .tile {
-            width: 60px; height: 60px; background: white; color: #1e293b; border-radius: 8px;
+            width: 55px; height: 55px; background: white; color: #1e293b; border-radius: 10px;
             display: flex; justify-content: center; align-items: center; font-size: 1.8rem; font-weight: bold;
             box-shadow: 0 4px 0 #94a3b8; flex-shrink: 0;
         }
         .tile.m { background: var(--gold); box-shadow: 0 4px 0 #b45309; }
 
-        #tray-area { height: 25%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .tray { display: flex; gap: 5px; }
-        .slot { width: 60px; height: 60px; border: 2px dashed #475569; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.5rem; }
-
-        #msg { font-size: 0.9rem; color: var(--green); margin-top: 10px; height: 20px; text-align: center; }
+        #msg { font-size: 0.9rem; color: var(--green); margin-top: 10px; height: 20px; font-weight: bold; }
+        #next-btn { padding: 10px 20px; background: var(--green); border: none; border-radius: 20px; font-weight: bold; color: #0f172a; margin-top: 5px; cursor: pointer;}
         .hidden { display: none !important; }
-        #next-btn { padding: 10px 20px; background: var(--green); border: none; border-radius: 20px; font-weight: bold; margin-top: 5px; }
+        
+        #tray-area { height: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .tray { display: flex; gap: 8px; }
+        .slot { width: 60px; height: 60px; border: 2px dashed #475569; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; background: rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h2 style="margin:0; font-size: 1.2rem;">Akshara Alchemist</h2>
-        <select id="lvl" onchange="start()" style="margin-top:5px; background:#1e293b; color:white; border:1px solid var(--blue); padding:3px;">
+        <h2 style="margin:0; font-size: 1.1rem; color: var(--blue);">Akshara Alchemist</h2>
+        <select id="lvl" onchange="start()" style="margin-top:5px; background:#1e293b; color:white; border:1px solid var(--blue); border-radius: 4px; padding: 2px 8px;">
             <option value="1">Level 1: Fusion</option>
             <option value="2">Level 2: Words</option>
         </select>
@@ -67,9 +68,9 @@
     <div class="game-grid">
         <div class="bank" id="v-bank"></div>
         <div class="forge-zone">
-            <div id="forge-circle" ondragover="event.preventDefault()" ondrop="dropToForge(event)" data-v="" data-m="">?</div>
-            <div id="msg">Drop a Vyanjan</div>
-            <button id="next-btn" class="hidden" onclick="moveNext()">Next</button>
+            <div id="forge-circle" ondragover="event.preventDefault()" ondrop="dropToForge(event)">?</div>
+            <div id="msg">Drag a Vyanjan</div>
+            <button id="next-btn" class="hidden" onclick="moveNext()">Next Challenge →</button>
         </div>
         <div class="bank" id="m-bank"></div>
     </div>
@@ -80,10 +81,14 @@
 </div>
 
 <script>
+    // GLOBAL MEMORY - This prevents letters from disappearing
+    let memory = { v: "", m: "", type: "", val: "" };
+    
     const l1 = [
         {t:"की",v:["क","ल"],m:["ा","ी"]},
         {t:"पु",v:["प","म"],m:["ु","ू"]},
-        {t:"मछली",v:["म","छ","ल"],m:["ी"]} // Level 2 logic will pull from here
+        {t:"दे",v:["द","स"],m:["े","ै"]},
+        {t:"मो",v:["म","न"],m:["ो","ौ"]}
     ];
     
     let idx = 0;
@@ -95,64 +100,71 @@
 
     function load() {
         const lvl = document.getElementById('lvl').value;
-        const data = l1[idx]; // Simplified for testing
+        const data = l1[idx];
         document.getElementById('target-text').innerText = data.t;
         document.getElementById('next-btn').classList.add('hidden');
-        document.getElementById('msg').innerText = "Drop a Vyanjan";
+        document.getElementById('msg').innerText = "Drag a Vyanjan";
         
-        // Reset Forge attributes
+        // Reset Logic
+        memory.v = ""; memory.m = "";
         const forge = document.getElementById('forge-circle');
-        forge.dataset.v = ""; forge.dataset.m = "";
         forge.innerText = "?";
         forge.style.borderStyle = "dashed";
 
         // Render Banks
         const vb = document.getElementById('v-bank'); vb.innerHTML = "<h3>VYANJAN</h3>";
-        data.v.forEach(v => vb.innerHTML += `<div class="tile" draggable="true" ondragstart="drag(event,'v','${v}')">${v}</div>`);
+        data.v.forEach(v => vb.innerHTML += `<div class="tile" draggable="true" ondragstart="drag('${v}','v')">${v}</div>`);
         
         const mb = document.getElementById('m-bank'); mb.innerHTML = "<h3>MATRA</h3>";
-        data.m.forEach(m => mb.innerHTML += `<div class="tile m" draggable="true" ondragstart="drag(event,'m','${m}')">${m}</div>`);
+        data.m.forEach(m => mb.innerHTML += `<div class="tile m" draggable="true" ondragstart="drag('${m}','m')">${m}</div>`);
 
         const trayArea = document.getElementById('tray-area');
         if(lvl == "2") {
             trayArea.classList.remove('hidden');
             const t = document.getElementById('tray'); t.innerHTML = "";
-            // Logic to split word into slots...
             t.innerHTML = `<div class="slot" ondragover="event.preventDefault()" ondrop="dropToTray(event)">?</div>`;
         } else { trayArea.classList.add('hidden'); }
     }
 
-    function drag(e, type, val) {
-        e.dataTransfer.setData("type", type);
-        e.dataTransfer.setData("val", val);
+    // UPDATED DRAG: We use global memory instead of dataTransfer
+    function drag(val, type) {
+        memory.val = val;
+        memory.type = type;
     }
 
     function dropToForge(e) {
         e.preventDefault();
         const forge = document.getElementById('forge-circle');
-        const type = e.dataTransfer.getData("type");
-        const val = e.dataTransfer.getData("val");
 
-        if(type === 'v') {
-            forge.dataset.v = val; // Store physically in the element
-            forge.dataset.m = ""; 
+        if(memory.type === 'v') {
+            memory.v = memory.val;
+            memory.m = ""; // Clear matra when new consonant is dropped
             document.getElementById('msg').innerText = "Now add Matra";
-        } else if(type === 'm' && forge.dataset.v !== "") {
-            forge.dataset.m = val; // Store physically in the element
+        } else if(memory.type === 'm' && memory.v !== "") {
+            memory.m = memory.val;
         }
 
-        // Always reconstruct from physical storage
-        forge.innerText = forge.dataset.v + forge.dataset.m;
+        // Re-render from memory
+        forge.innerText = memory.v + memory.m;
         forge.style.borderStyle = "solid";
 
-        // Check Victory Level 1
+        // Level 1 Win Check
         if(document.getElementById('lvl').value == "1" && forge.innerText === document.getElementById('target-text').innerText) {
             victory();
         }
     }
 
+    function dropToTray(e) {
+        e.preventDefault();
+        const forgeVal = memory.v + memory.m;
+        // Simplified check for testing
+        e.target.innerText = forgeVal;
+        e.target.style.background = "rgba(74, 222, 128, 0.2)";
+        victory();
+    }
+
     function victory() {
-        document.getElementById('msg').innerText = "Shabash!";
+        document.getElementById('msg').innerText = "Shabash! Excellent!";
         document.getElementById('next-btn').classList.remove('hidden');
     }
 
