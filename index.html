@@ -3,178 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Akshara Alchemist</title>
+    <title>Akshara Alchemist - Expanded Pro</title>
     <style>
-        :root { --bg: #0f172a; --blue: #38bdf8; --gold: #fbbf24; --white: #f1f5f9; --green: #4ade80; }
-        * { box-sizing: border-box; touch-action: none; } 
-        
-        body { 
-            height: 100vh; margin: 0; overflow: hidden; background: var(--bg); color: var(--white);
-            font-family: sans-serif; display: flex; flex-direction: column; align-items: center;
+        :root {
+            --bg-color: #0f172a;
+            --accent-blue: #38bdf8;
+            --accent-gold: #fbbf24;
+            --text-light: #f1f5f9;
+            --success-green: #4ade80;
+            --error-red: #ef4444;
         }
 
-        .container { width: 100%; max-width: 450px; height: 100%; display: flex; flex-direction: column; padding: 10px; }
-        header { text-align: center; height: 12%; }
-        #goal-area { text-align: center; height: 10%; display: flex; align-items: center; justify-content: center; }
-        #target-text { color: var(--gold); font-size: 2.2rem; font-weight: bold; }
-
-        /* THE GRID: NO CUT-OFFS */
-        .game-grid { display: grid; grid-template-columns: 75px 1fr 75px; gap: 10px; height: 50%; align-items: center; }
-        
-        .bank { 
-            background: rgba(255,255,255,0.05); border: 1px solid var(--blue); border-radius: 12px;
-            height: 90%; display: flex; flex-direction: column; align-items: center; padding: 5px; gap: 8px; overflow-y: auto;
+        * { box-sizing: border-box; -webkit-user-select: none; }
+        html, body { 
+            height: 100%; margin: 0; padding: 0; overflow: hidden; 
+            font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); color: var(--text-light);
         }
-        .bank h3 { font-size: 0.5rem; margin: 2px; color: var(--blue); letter-spacing: 1px; }
 
-        .forge-zone { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        #forge-circle {
-            width: 110px; height: 110px; border: 4px dashed var(--gold); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; font-size: 2.8rem;
-            background: rgba(251,191,36,0.05); box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
+        body { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+
+        .main-wrapper {
+            width: 100%; max-width: 850px; height: 95vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-around;
+        }
+
+        header { text-align: center; }
+        h1 { margin: 0; font-size: 1.6rem; color: var(--accent-blue); }
+        .timer { font-family: monospace; font-size: 1.2rem; color: var(--accent-gold); font-weight: bold; margin-top: 5px; }
+
+        .progress-container {
+            width: 200px; height: 6px; background: #334155; border-radius: 5px; margin: 10px auto; overflow: hidden;
+        }
+        #progress-bar { width: 0%; height: 100%; background: var(--success-green); transition: width 0.3s; }
+
+        #mission-goal { font-size: 1.2rem; display: flex; align-items: center; gap: 15px; }
+        #target-text { color: var(--accent-gold); font-weight: bold; font-size: 2.5rem; border-bottom: 2px solid #334155; padding: 0 10px; }
+
+        .game-container {
+            display: grid; grid-template-columns: 130px 1fr 130px; gap: 20px;
+            width: 100%; height: 50vh; align-items: center;
+        }
+
+        .bank {
+            background: rgba(15, 23, 42, 0.8); border: 2px solid rgba(56, 189, 248, 0.3);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.1); border-radius: 15px;
+            height: 100%; display: flex; flex-direction: column; gap: 12px;
+            padding: 15px 10px; overflow-y: auto; align-items: center;
+        }
+        .bank::-webkit-scrollbar { width: 0; }
+
+        .forge-area { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+
+        #transformation-circle {
+            width: 140px; height: 140px; border: 5px dashed var(--accent-gold); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; font-size: 4rem;
+            background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+            transition: all 0.3s;
+        }
+
+        /* SHAKE ANIMATION */
+        .shake { animation: shake 0.4s; border-color: var(--error-red) !important; background: rgba(239, 68, 68, 0.2) !important; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
         }
 
         .tile {
-            width: 55px; height: 55px; background: white; color: #1e293b; border-radius: 10px;
-            display: flex; justify-content: center; align-items: center; font-size: 1.8rem; font-weight: bold;
-            box-shadow: 0 4px 0 #94a3b8; flex-shrink: 0;
+            width: 65px; min-height: 65px; background: white; color: #1e293b;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 2.2rem; font-weight: bold; border-radius: 12px;
+            cursor: grab; box-shadow: 0 4px 0 #94a3b8; flex-shrink: 0;
         }
-        .tile.m { background: var(--gold); box-shadow: 0 4px 0 #b45309; }
+        .tile:active { cursor: grabbing; }
+        .matra-tile { background: var(--accent-gold); box-shadow: 0 4px 0 #b45309; }
 
-        #msg { font-size: 0.9rem; color: var(--green); margin-top: 10px; height: 20px; font-weight: bold; }
-        #next-btn { padding: 10px 20px; background: var(--green); border: none; border-radius: 20px; font-weight: bold; color: #0f172a; margin-top: 5px; cursor: pointer;}
+        #tray-container { min-height: 18vh; width: 100%; display: flex; flex-direction: column; align-items: center; }
+        .word-tray { display: flex; gap: 12px; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid #334155; border-radius: 15px; }
+
+        .word-slot {
+            width: 70px; height: 70px; border: 2px dashed #475569; border-radius: 10px;
+            display: flex; justify-content: center; align-items: center; font-size: 2.2rem; background: rgba(0,0,0,0.2); transition: 0.3s;
+        }
+
+        #message { height: 30px; color: var(--success-green); font-weight: bold; font-size: 1.1rem; text-align: center; }
+        #next-btn { padding: 10px 25px; border-radius: 30px; background: var(--success-green); border: none; font-weight: bold; cursor: pointer; color: #0f172a;}
         .hidden { display: none !important; }
-        
-        #tray-area { height: 20%; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .tray { display: flex; gap: 8px; }
-        .slot { width: 60px; height: 60px; border: 2px dashed #475569; border-radius: 10px; display: flex; justify-content: center; align-items: center; font-size: 1.8rem; background: rgba(0,0,0,0.2); }
+        h3 { font-size: 0.7rem; margin: 0; color: var(--accent-blue); text-transform: uppercase; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="main-wrapper">
     <header>
-        <h2 style="margin:0; font-size: 1.1rem; color: var(--blue);">Akshara Alchemist</h2>
-        <select id="lvl" onchange="start()" style="margin-top:5px; background:#1e293b; color:white; border:1px solid var(--blue); border-radius: 4px; padding: 2px 8px;">
-            <option value="1">Level 1: Fusion</option>
-            <option value="2">Level 2: Words</option>
-        </select>
+        <h1>Akshara Alchemist</h1>
+        <div class="timer">⏱️ <span id="clock">00:00</span></div>
+        <div class="controls">
+            <select id="level-selector" onchange="changeMode()" style="background:#1e293b; color:white; border:1px solid var(--accent-blue); padding:5px 10px; border-radius:5px;">
+                <option value="1">Level 1: Fusion Lab</option>
+                <option value="2">Level 2: Word Smith</option>
+            </select>
+            <div class="progress-container"><div id="progress-bar"></div></div>
+        </div>
     </header>
 
-    <div id="goal-area">
-        <div id="target-text">की</div>
-    </div>
+    <div id="mission-goal">Target: <span id="target-text">की</span></div>
 
-    <div class="game-grid">
-        <div class="bank" id="v-bank"></div>
-        <div class="forge-zone">
-            <div id="forge-circle" ondragover="event.preventDefault()" ondrop="dropToForge(event)">?</div>
-            <div id="msg">Drag a Vyanjan</div>
-            <button id="next-btn" class="hidden" onclick="moveNext()">Next Challenge →</button>
+    <div class="game-container">
+        <div class="bank">
+            <h3>Consonants</h3>
+            <div id="vyanjan-list" style="display:contents;"></div>
         </div>
-        <div class="bank" id="m-bank"></div>
+
+        <div class="forge-area">
+            <div id="transformation-circle" draggable="true" ondragstart="dragForge(event)">?</div>
+            <div id="message"></div>
+            <button id="next-btn" class="hidden" onclick="nextChallenge()">Next Level →</button>
+        </div>
+
+        <div class="bank">
+            <h3>Matras</h3>
+            <div id="matra-list" style="display:contents;"></div>
+        </div>
     </div>
 
-    <div id="tray-area" class="hidden">
-        <div class="tray" id="tray"></div>
+    <div id="tray-container" class="hidden">
+        <div class="word-tray" id="word-tray"></div>
     </div>
 </div>
 
 <script>
-    // GLOBAL MEMORY - This prevents letters from disappearing
-    let memory = { v: "", m: "", type: "", val: "" };
-    
-    const l1 = [
-        {t:"की",v:["क","ल"],m:["ा","ी"]},
-        {t:"पु",v:["प","म"],m:["ु","ू"]},
-        {t:"दे",v:["द","स"],m:["े","ै"]},
-        {t:"मो",v:["म","न"],m:["ो","ौ"]}
+    // DATASET (Full 50)
+    const level1Data = [
+        { target: "की", v: ["क", "ल"], m: ["ा", "ी"] }, { target: "पु", v: ["प", "न"], m: ["ु", "ू"] },
+        { target: "दे", v: ["द", "म"], m: ["े", "ै"] }, { target: "मो", v: ["म", "स"], m: ["ो", "ौ"] },
+        { target: "रि", v: ["र", "ज"], m: ["ि", "ी"] }, { target: "सा", v: ["स", "प"], m: ["ा", "ु"] },
+        { target: "नू", v: ["न", "त"], m: ["ु", "ू"] }, { target: "है", v: ["ह", "क"], m: ["े", "ै"] },
+        { target: "चो", v: ["च", "ल"], m: ["ो", "ौ"] }, { target: "बी", v: ["ब", "प"], m: ["ि", "ी"] },
+        { target: "टा", v: ["ट", "ड"], m: ["ा", "े"] }, { target: "गौ", v: ["ग", "ज"], m: ["ो", "ौ"] },
+        { target: "खि", v: ["ख", "ग"], m: ["ि", "ी"] }, { target: "पे", v: ["प", "ब"], m: ["े", "ै"] },
+        { target: "धु", v: ["ध", "थ"], m: ["ु", "ू"] }, { target: "लै", v: ["ल", "व"], m: ["े", "ै"] },
+        { target: "नो", v: ["न", "म"], m: ["ो", "ा"] }, { target: "सी", v: ["स", "श"], m: ["ि", "ी"] },
+        { target: "कृ", v: ["क", "भ"], m: ["ृ", "ु"] }, { target: "थै", v: ["थ", "ट"], m: ["े", "ै"] },
+        { target: "जो", v: ["ज", "झ"], m: ["ो", "ौ"] }, { target: "दू", v: ["द", "ब"], m: ["ु", "ू"] },
+        { target: "मी", v: ["म", "ल"], m: ["ि", "ी"] }, { target: "रा", v: ["र", "त"], m: ["ा", "ि"] },
+        { target: "फू", v: ["फ", "प"], m: ["ु", "ू"] }
     ];
-    
-    let idx = 0;
 
-    function start() {
-        idx = 0;
-        load();
-    }
+    const level2Data = [
+        { word: "काम", parts: ["का", "म"], v: ["क", "म"], m: ["ा"] },
+        { word: "किताब", parts: ["कि", "ता", "ब"], v: ["क", "त", "ब"], m: ["ि", "ा"] },
+        { word: "मछली", parts: ["म", "छ", "ली"], v: ["म", "छ", "ल"], m: ["ी"] },
+        { word: "गुलाब", parts: ["गु", "ला", "ब"], v: ["ग", "ल", "ब"], m: ["ु", "ा"] },
+        { word: "पेड़", parts: ["पे", "ड़"], v: ["प", "ड़"], m: ["े"] },
+        { word: "सूरज", parts: ["सू", "र", "ज"], v: ["स", "र", "ज"], m: ["ू"] },
+        { word: "टोपी", parts: ["टो", "पी"], v: ["ट", "प"], m: ["ो", "ी"] },
+        { word: "पौधा", parts: ["पौ", "धा"], v: ["प", "ध"], m: ["ौ", "ा"] },
+        { word: "हाथी", parts: ["हा", "थी"], v: ["ह", "थ"], m: ["ा", "ी"] },
+        { word: "चिड़िया", parts: ["चि", "ड़ि", "या"], v: ["च", "ड़", "य"], m: ["ि", "ा"] },
+        { word: "रेल", parts: ["रे", "ल"], v: ["र", "ल"], m: ["े"] },
+        { word: "बैल", parts: ["बै", "ल"], v: ["ब", "ल"], m: ["ै"] },
+        { word: "कौआ", parts: ["कौ", "आ"], v: ["क", "आ"], m: ["ौ"] },
+        { word: "माला", parts: ["मा", "ला"], v: ["म", "ल"], m: ["ा"] },
+        { word: "साधु", parts: ["सा", "धु"], v: ["स", "ध"], m: ["ा", "ु"] },
+        { word: "जूता", parts: ["जू", "ता"], v: ["ज", "त"], m: ["ू", "ा"] },
+        { word: "केला", parts: ["के", "ला"], v: ["क", "ल"], m: ["े", "ा"] },
+        { word: "सैनिक", parts: ["सै", "नि", "क"], v: ["स", "न", "क"], m: ["ै", "ि"] },
+        { word: "मोर", parts: ["मो", "र"], v: ["म", "र"], m: ["ो"] },
+        { word: "कृषि", parts: ["कृ", "षि"], v: ["क", "ष"], m: ["ृ", "ि"] },
+        { word: "सेब", parts: ["से", "ब"], v: ["स", "ब"], m: ["े"] },
+        { word: "पैसा", parts: ["पै", "सा"], v: ["प", "स"], m: ["ै", "ा"] },
+        { word: "ढोल", parts: ["ढो", "ल"], v: ["ढ", "ल"], m: ["ो"] },
+        { word: "नौका", parts: ["नौ", "का"], v: ["न", "क"], m: ["ौ", "ा"] },
+        { word: "वृक्ष", parts: ["वृ", "क्ष"], v: ["व", "क्ष"], m: ["ृ"] }
+    ];
 
-    function load() {
-        const lvl = document.getElementById('lvl').value;
-        const data = l1[idx];
-        document.getElementById('target-text').innerText = data.t;
-        document.getElementById('next-btn').classList.add('hidden');
-        document.getElementById('msg').innerText = "Drag a Vyanjan";
-        
-        // Reset Logic
-        memory.v = ""; memory.m = "";
-        const forge = document.getElementById('forge-circle');
-        forge.innerText = "?";
-        forge.style.borderStyle = "dashed";
+    let currentLevel = 1;
+    let challengeIdx = 0;
+    let forgedV = "";
+    let forgedM = "";
+    let timer = 0, clockInterval = null;
 
-        // Render Banks
-        const vb = document.getElementById('v-bank'); vb.innerHTML = "<h3>VYANJAN</h3>";
-        data.v.forEach(v => vb.innerHTML += `<div class="tile" draggable="true" ondragstart="drag('${v}','v')">${v}</div>`);
-        
-        const mb = document.getElementById('m-bank'); mb.innerHTML = "<h3>MATRA</h3>";
-        data.m.forEach(m => mb.innerHTML += `<div class="tile m" draggable="true" ondragstart="drag('${m}','m')">${m}</div>`);
-
-        const trayArea = document.getElementById('tray-area');
-        if(lvl == "2") {
-            trayArea.classList.remove('hidden');
-            const t = document.getElementById('tray'); t.innerHTML = "";
-            t.innerHTML = `<div class="slot" ondragover="event.preventDefault()" ondrop="dropToTray(event)">?</div>`;
-        } else { trayArea.classList.add('hidden'); }
-    }
-
-    // UPDATED DRAG: We use global memory instead of dataTransfer
-    function drag(val, type) {
-        memory.val = val;
-        memory.type = type;
-    }
-
-    function dropToForge(e) {
-        e.preventDefault();
-        const forge = document.getElementById('forge-circle');
-
-        if(memory.type === 'v') {
-            memory.v = memory.val;
-            memory.m = ""; // Clear matra when new consonant is dropped
-            document.getElementById('msg').innerText = "Now add Matra";
-        } else if(memory.type === 'm' && memory.v !== "") {
-            memory.m = memory.val;
+    // AUDIO ENGINE
+    function playSound(type) {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        if (type === 'success') {
+            osc.frequency.setValueAtTime(523, context.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(880, context.currentTime + 0.1);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, context.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(40, context.currentTime + 0.2);
         }
+        osc.connect(gain); gain.connect(context.destination);
+        osc.start(); osc.stop(context.currentTime + 0.3);
+    }
 
-        // Re-render from memory
-        forge.innerText = memory.v + memory.m;
-        forge.style.borderStyle = "solid";
+    function changeMode() {
+        currentLevel = parseInt(document.getElementById('level-selector').value);
+        challengeIdx = 0;
+        startTimer();
+        loadChallenge();
+    }
 
-        // Level 1 Win Check
-        if(document.getElementById('lvl').value == "1" && forge.innerText === document.getElementById('target-text').innerText) {
-            victory();
+    function startTimer() {
+        if(clockInterval) clearInterval(clockInterval);
+        timer = 0;
+        clockInterval = setInterval(() => {
+            timer++;
+            let m = Math.floor(timer/60).toString().padStart(2, '0');
+            let s = (timer%60).toString().padStart(2, '0');
+            document.getElementById('clock').innerText = `${m}:${s}`;
+        }, 1000);
+    }
+
+    function loadChallenge() {
+        const trayCont = document.getElementById('tray-container');
+        const nextBtn = document.getElementById('next-btn');
+        resetForge();
+        nextBtn.classList.add('hidden');
+        updateProgress();
+
+        if (currentLevel === 1) {
+            trayCont.classList.add('hidden');
+            const data = level1Data[challengeIdx];
+            document.getElementById('target-text').innerText = data.target;
+            fillBanks(data.v, data.m);
+        } else {
+            trayCont.classList.remove('hidden');
+            const data = level2Data[challengeIdx];
+            document.getElementById('target-text').innerText = data.word;
+            fillBanks(data.v, data.m);
+            setupTray(data.parts);
         }
     }
 
-    function dropToTray(e) {
+    function fillBanks(vList, mList) {
+        const vDiv = document.getElementById('vyanjan-list');
+        const mDiv = document.getElementById('matra-list');
+        vDiv.innerHTML = ""; mDiv.innerHTML = "";
+        vList.forEach(v => { vDiv.innerHTML += `<div class="tile" draggable="true" ondragstart="drag(event)" data-type="v">${v}</div>`; });
+        mList.forEach(m => { mDiv.innerHTML += `<div class="tile matra-tile" draggable="true" ondragstart="drag(event)" data-type="m">${m}</div>`; });
+    }
+
+    function setupTray(parts) {
+        const tray = document.getElementById('word-tray');
+        tray.innerHTML = "";
+        parts.forEach(p => { tray.innerHTML += `<div class="slot word-slot" ondragover="allowDrop(event)" ondrop="dropInTray(event, '${p}')">?</div>`; });
+    }
+
+    function drag(e) { e.dataTransfer.setData("type", e.target.dataset.type); e.dataTransfer.setData("val", e.target.innerText); }
+    function dragForge(e) { e.dataTransfer.setData("type", "forged"); e.dataTransfer.setData("val", e.target.innerText); }
+    function allowDrop(e) { e.preventDefault(); }
+
+    const forge = document.getElementById('transformation-circle');
+    forge.ondragover = allowDrop;
+    forge.ondrop = (e) => {
+        const type = e.dataTransfer.getData("type");
+        const val = e.dataTransfer.getData("val");
+        forge.classList.remove('shake');
+
+        if (type === "v") { forgedV = val; forgedM = ""; forge.innerText = val; }
+        if (type === "m") { 
+            if(forgedV === "") return;
+            forgedM = val; 
+            const combined = forgedV + forgedM;
+            forge.innerText = combined;
+
+            if (currentLevel === 1) {
+                if (combined === level1Data[challengeIdx].target) victory();
+                else triggerError(forge);
+            }
+        }
+    };
+
+    function dropInTray(e, targetPart) {
         e.preventDefault();
-        const forgeVal = memory.v + memory.m;
-        // Simplified check for testing
-        e.target.innerText = forgeVal;
-        e.target.style.background = "rgba(74, 222, 128, 0.2)";
-        victory();
+        const val = e.dataTransfer.getData("val");
+        if (val === targetPart) {
+            e.target.innerText = val;
+            e.target.style.borderColor = "var(--success-green)";
+            e.target.style.background = "rgba(74, 222, 128, 0.1)";
+            resetForge();
+            document.getElementById('message').innerText = "Next part!";
+            checkWordComplete();
+        } else {
+            triggerError(e.target);
+            document.getElementById('message').innerText = "Wrong part!";
+        }
+    }
+
+    function triggerError(el) {
+        playSound('error');
+        el.classList.add('shake');
+        setTimeout(() => {
+            el.classList.remove('shake');
+            // STRICTURE: Wipe everything on failure
+            resetForge();
+            document.getElementById('message').innerText = "Failed! Try again.";
+        }, 400);
+    }
+
+    function checkWordComplete() {
+        const slots = document.querySelectorAll('.word-slot');
+        if (Array.from(slots).every(s => s.innerText !== "?")) victory();
     }
 
     function victory() {
-        document.getElementById('msg').innerText = "Shabash! Excellent!";
+        playSound('success');
+        document.getElementById('message').innerText = "Shabash! Success!";
         document.getElementById('next-btn').classList.remove('hidden');
     }
 
-    function moveNext() {
-        idx++;
-        if(idx >= l1.length) idx = 0;
-        load();
+    function updateProgress() {
+        const max = currentLevel === 1 ? level1Data.length : level2Data.length;
+        const perc = (challengeIdx / max) * 100;
+        document.getElementById('progress-bar').style.width = perc + "%";
     }
 
-    start();
+    function nextChallenge() {
+        challengeIdx++;
+        const max = currentLevel === 1 ? level1Data.length : level2Data.length;
+        if (challengeIdx >= max) { alert("Level Complete!"); challengeIdx = 0; }
+        loadChallenge();
+    }
+
+    function resetForge() {
+        forgedV = ""; forgedM = "";
+        forge.innerText = "?";
+        document.getElementById('message').innerText = "";
+    }
+
+    startTimer();
+    loadChallenge();
 </script>
 </body>
 </html>
